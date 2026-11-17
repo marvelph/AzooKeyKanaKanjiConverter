@@ -148,6 +148,8 @@ public struct Candidate: Sendable {
     public var value: PValue
 
     public var composingCount: ComposingCount
+    /// The clauses of this exact conversion, in input order. Empty when no segmentation is available.
+    public internal(set) var clauses: [Candidate] = []
     /// 最後のmid(予測変換に利用)
     public var lastMid: Int
     /// DicdataElement列

@@ -40,12 +40,28 @@ struct Kana2Kanji {
                 $0 = .composite($0, range.count)
             }
         }
-        return Candidate(
+        var candidate = Candidate(
             text: text,
             value: value,
             composingCount: composingCount,
             lastMid: lastMid,
             data: data.data
         )
+        if data.clauses.count > 1 {
+            var start = data.data.startIndex
+            candidate.clauses = data.clauses.map { unit in
+                let clause = unit.clause
+                let end = min(data.data.endIndex, max(start, clause.dataEndIndex + 1))
+                defer { start = end }
+                return Candidate(
+                    text: clause.text,
+                    value: unit.value,
+                    composingCount: clause.ranges.reduce(.inputCount(0)) { .composite($0, $1.count) },
+                    lastMid: clause.mid,
+                    data: Array(data.data[start..<end])
+                )
+            }
+        }
+        return candidate
     }
 }
